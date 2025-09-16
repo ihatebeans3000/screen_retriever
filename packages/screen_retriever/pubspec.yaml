@@ -15,9 +15,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  screen_retriever_linux: ^0.2.0
-  screen_retriever_macos: ^0.2.0
-  screen_retriever_platform_interface: ^0.2.0
+  screen_retriever_linux:
+    path: ../screen_retriever_linux
+  screen_retriever_macos:
+    path: ../screen_retriever_macos
+  screen_retriever_platform_interface:
+    path: ../screen_retriever_platform_interface
   screen_retriever_windows:
     path: ../screen_retriever_windows
 

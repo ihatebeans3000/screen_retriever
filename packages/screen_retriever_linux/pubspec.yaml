@@ -19,7 +19,7 @@ dev_dependencies:
 
 flutter:
   plugin:
-    implements: screen_retriever
+    implements: screen_retriever2
     platforms:
       linux:
         pluginClass: ScreenRetrieverLinuxPlugin
