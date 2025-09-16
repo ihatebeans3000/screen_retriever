@@ -19,7 +19,7 @@ dependencies:
   screen_retriever_macos: ^0.2.0
   screen_retriever_platform_interface: ^0.2.0
   screen_retriever_windows:
-    path: ../packages/screen_retriever_windows
+    path: ../screen_retriever_windows
 
 dev_dependencies:
   flutter_test:
