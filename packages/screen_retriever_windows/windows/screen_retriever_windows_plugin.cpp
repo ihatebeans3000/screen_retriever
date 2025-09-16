@@ -131,23 +131,13 @@ flutter::EncodableMap MonitorToEncodableMap(HMONITOR monitor) {
   visiblePosition[flutter::EncodableValue("dx")] = flutter::EncodableValue(visibleX);
   visiblePosition[flutter::EncodableValue("dy")] = flutter::EncodableValue(visibleY);
 
-  DISPLAY_DEVICE displayDevice;
-  displayDevice.cb = sizeof(DISPLAY_DEVICE);
-  int deviceIndex = 0;
+  std::string deviceNameStr = converter.to_bytes(displayDevice.DeviceName);
+  size_t pos = deviceNameStr.find_last_of("0123456789");
   int screenId = 0;
-  while (EnumDisplayDevices(info.szDevice, deviceIndex, &displayDevice, 0)) {
-    if ((displayDevice.StateFlags & DISPLAY_DEVICE_ACTIVE) &&
-        (displayDevice.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)) {
-      std::string deviceIdStr = converter.to_bytes(displayDevice.DeviceID);
-      size_t pos = deviceIdStr.find_last_of("0123456789");
-      if (pos != std::string::npos) {
-        size_t start = deviceIdStr.find_last_not_of("0123456789", pos) + 1;
-        int displayNumber = std::stoi(deviceIdStr.substr(start, pos - start + 1));
-        screenId = displayNumber - 1;
-      }
-      break;
-    }
-    deviceIndex++;
+  if (pos != std::string::npos) {
+    size_t start = deviceNameStr.find_last_not_of("0123456789", pos) + 1;
+    int displayNumber = std::stoi(deviceNameStr.substr(start, pos - start + 1));
+    screenId = displayNumber - 1;
   }
 
   flutter::EncodableMap display;
