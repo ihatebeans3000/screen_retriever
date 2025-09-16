@@ -1,4 +1,4 @@
-name: screen_retriever
+name: screen_retriever2
 description: This plugin allows Flutter desktop apps to Retrieve information about screen size, displays, cursor position, etc.
 version: 0.2.0
 homepage: https://github.com/leanflutter/screen_retriever
