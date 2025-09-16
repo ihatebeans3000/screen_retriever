@@ -138,7 +138,7 @@ flutter::EncodableMap MonitorToEncodableMap(HMONITOR monitor) {
   while (EnumDisplayDevices(info.szDevice, deviceIndex, &displayDevice, 0)) {
     if ((displayDevice.StateFlags & DISPLAY_DEVICE_ACTIVE) &&
         (displayDevice.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)) {
-      std::string deviceIdStr = converter.to_bytes(displayDevice.DeviceID); // 예: \\.\DISPLAY5
+      std::string deviceIdStr = converter.to_bytes(displayDevice.DeviceID);
       size_t pos = deviceIdStr.find_last_of("0123456789");
       if (pos != std::string::npos) {
         size_t start = deviceIdStr.find_last_not_of("0123456789", pos) + 1;
