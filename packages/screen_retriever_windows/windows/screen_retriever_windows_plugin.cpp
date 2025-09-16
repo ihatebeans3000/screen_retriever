@@ -134,15 +134,16 @@ flutter::EncodableMap MonitorToEncodableMap(HMONITOR monitor) {
   DISPLAY_DEVICE displayDevice;
   displayDevice.cb = sizeof(DISPLAY_DEVICE);
   int deviceIndex = 0;
-  int deviceNumber = 0;
+  int screenId = 0;
   while (EnumDisplayDevices(info.szDevice, deviceIndex, &displayDevice, 0)) {
     if ((displayDevice.StateFlags & DISPLAY_DEVICE_ACTIVE) &&
         (displayDevice.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)) {
-      std::string deviceIdStr = converter.to_bytes(displayDevice.DeviceID);
+      std::string deviceIdStr = converter.to_bytes(displayDevice.DeviceID); // 예: \\.\DISPLAY5
       size_t pos = deviceIdStr.find_last_of("0123456789");
       if (pos != std::string::npos) {
         size_t start = deviceIdStr.find_last_not_of("0123456789", pos) + 1;
-        deviceNumber = std::stoi(deviceIdStr.substr(start, pos - start + 1)) - 1;
+        int displayNumber = std::stoi(deviceIdStr.substr(start, pos - start + 1));
+        screenId = displayNumber - 1;
       }
       break;
     }
@@ -150,7 +151,7 @@ flutter::EncodableMap MonitorToEncodableMap(HMONITOR monitor) {
   }
 
   flutter::EncodableMap display;
-  display[flutter::EncodableValue("id")] = flutter::EncodableValue(std::to_string(deviceNumber));
+  display[flutter::EncodableValue("id")] = flutter::EncodableValue(std::to_string(screenId));
   display[flutter::EncodableValue("name")] = flutter::EncodableValue(converter.to_bytes(display_name).c_str());
   display[flutter::EncodableValue("size")] = flutter::EncodableValue(size);
   display[flutter::EncodableValue("visibleSize")] = flutter::EncodableValue(visibleSize);
