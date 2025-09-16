@@ -131,7 +131,7 @@ flutter::EncodableMap MonitorToEncodableMap(HMONITOR monitor) {
   visiblePosition[flutter::EncodableValue("dx")] = flutter::EncodableValue(visibleX);
   visiblePosition[flutter::EncodableValue("dy")] = flutter::EncodableValue(visibleY);
 
-  std::string deviceNameStr = converter.to_bytes(displayDevice.DeviceName);
+  std::string deviceNameStr = converter.to_bytes(display_name);
   size_t pos = deviceNameStr.find_last_of("0123456789");
   int screenId = 0;
   if (pos != std::string::npos) {
