@@ -168,17 +168,15 @@ flutter::EncodableMap MonitorToEncodableMap(HMONITOR monitor) {
 //    deviceIndex++;
 //  }
 
-  // 1. DISPLAY_DEVICE 가져오기
   DISPLAY_DEVICE displayDevice;
   displayDevice.cb = sizeof(DISPLAY_DEVICE);
   int deviceIndex = 0;
-  int deviceNumber = 0; // Electron style ID
+  int deviceNumber = 0;
   while (EnumDisplayDevices(info.szDevice, deviceIndex, &displayDevice, 0)) {
     if ((displayDevice.StateFlags & DISPLAY_DEVICE_ACTIVE) &&
         (displayDevice.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)) {
-
       std::string deviceIdStr = converter.to_bytes(displayDevice.DeviceID);
-      // DeviceID 예: "\\.\DISPLAY1", "\\.\DISPLAY5"
+
       size_t pos = deviceIdStr.find_last_of("0123456789");
       if (pos != std::string::npos) {
         size_t start = deviceIdStr.find_last_not_of("0123456789", pos) + 1;
@@ -186,12 +184,14 @@ flutter::EncodableMap MonitorToEncodableMap(HMONITOR monitor) {
       }
       break;
     }
-    deviceIndex++; 
+    deviceIndex++;
   }
 
-  // 2. 화면 정보 구성
+  std::ostringstream oss;
+  oss << deviceNumber << ": Screen " << (screenIndex + 1);
+
   flutter::EncodableMap display;
-  display[flutter::EncodableValue("id")] = flutter::EncodableValue(std::to_string(deviceNumber));
+  display[flutter::EncodableValue("id")] = flutter::EncodableValue(oss.str());
   display[flutter::EncodableValue("name")] =
       flutter::EncodableValue(converter.to_bytes(display_name).c_str());
   display[flutter::EncodableValue("size")] = flutter::EncodableValue(size);
