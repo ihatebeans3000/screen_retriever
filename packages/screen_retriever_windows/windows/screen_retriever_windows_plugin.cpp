@@ -131,7 +131,6 @@ flutter::EncodableMap MonitorToEncodableMap(HMONITOR monitor) {
   visiblePosition[flutter::EncodableValue("dx")] = flutter::EncodableValue(visibleX);
   visiblePosition[flutter::EncodableValue("dy")] = flutter::EncodableValue(visibleY);
 
-  // ===== 여기서 ID를 Device Number 기반 숫자 문자열로 생성 =====
   DISPLAY_DEVICE displayDevice;
   displayDevice.cb = sizeof(DISPLAY_DEVICE);
   int deviceIndex = 0;
@@ -143,7 +142,7 @@ flutter::EncodableMap MonitorToEncodableMap(HMONITOR monitor) {
       size_t pos = deviceIdStr.find_last_of("0123456789");
       if (pos != std::string::npos) {
         size_t start = deviceIdStr.find_last_not_of("0123456789", pos) + 1;
-        deviceNumber = std::stoi(deviceIdStr.substr(start, pos - start + 1)) - 1; // 0부터 시작
+        deviceNumber = std::stoi(deviceIdStr.substr(start, pos - start + 1)) - 1;
       }
       break;
     }
