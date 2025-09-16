@@ -115,59 +115,23 @@ flutter::EncodableMap MonitorToEncodableMap(HMONITOR monitor) {
 
   double scale_factor = dpi / kBaseDpi;
 
-  double visibleWidth =
-      round((info.rcWork.right - info.rcWork.left) / scale_factor);
-  double visibleHeight =
-      round((info.rcWork.bottom - info.rcWork.top) / scale_factor);
-
+  double visibleWidth = round((info.rcWork.right - info.rcWork.left) / scale_factor);
+  double visibleHeight = round((info.rcWork.bottom - info.rcWork.top) / scale_factor);
   double visibleX = round((info.rcWork.left) / scale_factor);
   double visibleY = round((info.rcWork.top) / scale_factor);
 
-  flutter::EncodableMap size = flutter::EncodableMap();
-  flutter::EncodableMap visibleSize = flutter::EncodableMap();
-  flutter::EncodableMap visiblePosition = flutter::EncodableMap();
+  flutter::EncodableMap size, visibleSize, visiblePosition;
+  size[flutter::EncodableValue("width")] = flutter::EncodableValue(static_cast<double>(
+      round(info.rcMonitor.right / scale_factor - visibleX)));
+  size[flutter::EncodableValue("height")] = flutter::EncodableValue(static_cast<double>(
+      round(info.rcMonitor.bottom / scale_factor - visibleY)));
 
-  size[flutter::EncodableValue("width")] =
-      flutter::EncodableValue(static_cast<double>(
-          round(info.rcMonitor.right / scale_factor - visibleX)));
-  size[flutter::EncodableValue("height")] =
-      flutter::EncodableValue(static_cast<double>(
-          round(info.rcMonitor.bottom / scale_factor - visibleY)));
+  visibleSize[flutter::EncodableValue("width")] = flutter::EncodableValue(visibleWidth);
+  visibleSize[flutter::EncodableValue("height")] = flutter::EncodableValue(visibleHeight);
+  visiblePosition[flutter::EncodableValue("dx")] = flutter::EncodableValue(visibleX);
+  visiblePosition[flutter::EncodableValue("dy")] = flutter::EncodableValue(visibleY);
 
-  visibleSize[flutter::EncodableValue("width")] =
-      flutter::EncodableValue(visibleWidth);
-  visibleSize[flutter::EncodableValue("height")] =
-      flutter::EncodableValue(visibleHeight);
-
-  visiblePosition[flutter::EncodableValue("dx")] =
-      flutter::EncodableValue(visibleX);
-  visiblePosition[flutter::EncodableValue("dy")] =
-      flutter::EncodableValue(visibleY);
-
-//  flutter::EncodableMap display = flutter::EncodableMap();
-//
-//  std::ostringstream oss;
-//  oss << monitor;
-//  display[flutter::EncodableValue("id")] = flutter::EncodableValue(oss.str());
-
-
-//
-//  display[flutter::EncodableValue("id")] = flutter::EncodableValue("");
-//  DISPLAY_DEVICE displayDevice;
-//  displayDevice.cb = sizeof(DISPLAY_DEVICE);
-//  int deviceIndex = 0;
-//  while (EnumDisplayDevices(info.szDevice, deviceIndex, &displayDevice, 0)) {
-//    if (displayDevice.StateFlags & DISPLAY_DEVICE_ACTIVE &&
-//        (displayDevice.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)) {
-//      std::wstring deviceName(displayDevice.DeviceName);
-//      if (deviceName.find(info.szDevice) == 0) {
-//        display[flutter::EncodableValue("id")] = flutter::EncodableValue(
-//            converter.to_bytes(displayDevice.DeviceID).c_str());
-//      }
-//    }
-//    deviceIndex++;
-//  }
-
+  // ===== 여기서 ID를 Device Number 기반 숫자 문자열로 생성 =====
   DISPLAY_DEVICE displayDevice;
   displayDevice.cb = sizeof(DISPLAY_DEVICE);
   int deviceIndex = 0;
@@ -176,7 +140,6 @@ flutter::EncodableMap MonitorToEncodableMap(HMONITOR monitor) {
     if ((displayDevice.StateFlags & DISPLAY_DEVICE_ACTIVE) &&
         (displayDevice.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)) {
       std::string deviceIdStr = converter.to_bytes(displayDevice.DeviceID);
-
       size_t pos = deviceIdStr.find_last_of("0123456789");
       if (pos != std::string::npos) {
         size_t start = deviceIdStr.find_last_not_of("0123456789", pos) + 1;
@@ -187,23 +150,17 @@ flutter::EncodableMap MonitorToEncodableMap(HMONITOR monitor) {
     deviceIndex++;
   }
 
-  std::ostringstream oss;
-  oss << deviceNumber << ": Screen " << (screenIndex + 1);
-
   flutter::EncodableMap display;
-  display[flutter::EncodableValue("id")] = flutter::EncodableValue(oss.str());
-  display[flutter::EncodableValue("name")] =
-      flutter::EncodableValue(converter.to_bytes(display_name).c_str());
+  display[flutter::EncodableValue("id")] = flutter::EncodableValue(std::to_string(deviceNumber));
+  display[flutter::EncodableValue("name")] = flutter::EncodableValue(converter.to_bytes(display_name).c_str());
   display[flutter::EncodableValue("size")] = flutter::EncodableValue(size);
-  display[flutter::EncodableValue("visibleSize")] =
-      flutter::EncodableValue(visibleSize);
-  display[flutter::EncodableValue("visiblePosition")] =
-      flutter::EncodableValue(visiblePosition);
-  display[flutter::EncodableValue("scaleFactor")] =
-      flutter::EncodableValue(scale_factor);
+  display[flutter::EncodableValue("visibleSize")] = flutter::EncodableValue(visibleSize);
+  display[flutter::EncodableValue("visiblePosition")] = flutter::EncodableValue(visiblePosition);
+  display[flutter::EncodableValue("scaleFactor")] = flutter::EncodableValue(scale_factor);
 
   return display;
 }
+
 
 BOOL CALLBACK MonitorRepresentationEnumProc(HMONITOR monitor,
                                             HDC hdc,
@@ -216,6 +173,7 @@ BOOL CALLBACK MonitorRepresentationEnumProc(HMONITOR monitor,
       flutter::EncodableValue(display));
   return TRUE;
 }
+
 
 void ScreenRetrieverWindowsPlugin::GetCursorScreenPoint(
     const flutter::MethodCall<flutter::EncodableValue>& method_call,
